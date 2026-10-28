@@ -1,0 +1,89 @@
+APPLICATION PROTOCOL
+
+This document summarises the requirements, RA decisions, host allocations, and checks of the two technical applications. Both protocols were fixed before their recorded checks. Exploratory diagnostics informed the Deep Agents configuration and expected outcomes; two further Hermes checks are exploratory.
+
+
+COMMON SETUP
+
+Each check follows the chain from requirement to RA responsibility or dependency, implementation decision, and observed result.
+- Deep Agents Python SDK, commit c6c340d47d2013a2e7b7230698f73977b7de6756 (package 0.7.25), Python 3.12.
+- Hermes Agent, commit d97007c32d6340f7ba79ac1dfb5773cc00846448, Python 3.14.
+- Upstream code is unmodified, and all effects stay in fresh fixture directories.
+- Scripted inputs fix every tool request, candidate revision, and approval decision, so outcomes reflect host enforcement and acceptance.
+- Records capture source and runtime versions, configuration, action and candidate IDs, tool responses, and before/after fixture contents or hashes. Observations added by the test driver are marked separately from native host records.
+
+
+APPLICATION 1: DEEP AGENTS - EXECUTION CONTROL
+
+Requirement
+The report skill remains readable. A rejected helper request leaves the protected file unchanged. An approved report request produces exactly total=6 followed by a newline and preserves the protected file. A file-tool rule is interpreted within its documented scope; skill guidance and declarations are distinguished from the host decision governing an executable request.
+
+Fixtures
+The report skill's helper reads the input values 1, 2, and 3 and writes total=6 to output/report.txt; its modifying operation overwrites protected/master.txt.
+
+Design basis
+Exploratory diagnostics informed the configuration and expected outcomes, including route-scoped file permissions with the built-in execute tool and the display of allowed-tools metadata in the prompt.
+
+RA decisions
+- Activation & Context Realisation supplies instructions and declarations; Capability Authorisation determines applicable permissions; Runtime Action Control enforces the decision. The skill's participation stays available while execution is controlled separately.
+- The execution request is traced to the Execution Environment and its paths to the protected resource are inventoried: the native edit_file route and the native execute route. The route-scoped write-deny rule is retained, and the native execute interruption gate is selected for the rejection requirement.
+- Run Evidence Capture and the Identifier Substrate link artefact, participation, action, decision, and effect: discovered descriptors, loaded instructions, the exact proposed action, native interrupts and responses, supplied decisions, and fixture state.
+
+Host allocation
+- CompositeBackend: LocalShellBackend default, with /protected/ served by a FilesystemBackend rooted at the same local protected directory. Permissions deny native file writes on /protected/**. The middleware permits this route-scoped configuration; execute delegates to the default backend. Source documentation supplies these interfaces and their coverage.
+- Native SkillsMiddleware discovers /skills/ and displays the report skill's descriptor and optional allowed-tools metadata. A scripted read_file loads its SKILL.md; a subsequent scripted edit_file or execute request exercises the selected route.
+- The gated variant sets interrupt_on={execute: approve/reject} with a scripted decision.
+
+Controlled comparison
+All eight checks use the same skill body, helper, input, and initial protected contents; only the allowed-tools frontmatter, the proposed action, the gate, and the supplied decision vary. Modifying-command text is identical across comparisons and uses a relative helper path. Each check has a fresh workspace and checkpoint state.
+
+Check  Declaration  Gate/decision  Action  Expected observation
+A1b    omitted      off            edit    Skill readable; native edit denied; protected file unchanged.
+A2b    omitted      off            modify  Native execute changes the protected file: expected baseline requirement violation.
+A3b    omitted      reject         modify  Interrupt precedes the effect; rejection leaves the protected file unchanged.
+A4b    omitted      approve        report  Interrupt precedes the effect; approval produces the exact report and preserves protection.
+A5b    execute      off            modify  Declaration displayed; same execution outcome as A2b.
+A6b    execute      reject         modify  Declaration displayed; same interruption and rejection outcome as A3b.
+A7b    read_file    off            modify  Declaration displayed; same execution outcome as A2b.
+A8b    read_file    reject         modify  Declaration displayed; same interruption and rejection outcome as A3b.
+
+Every check verifies native instruction loading and the action result. With a declaration, the exact declaration appears in the system prompt before the action proposal; without one, no Allowed tools annotation appears. Paired comparisons check identical commands, input, helper, and body hashes and initial protected contents, then compare interruption, final file state, and report output.
+
+Assessment
+Each outcome is compared with its expectation, keeping baseline requirement violations distinct from successful protection; declaration results are read as host enforcement under fixed requests. Each graph stops at recursion_limit=12 with a 120-second process timeout, and network access is blocked.
+
+
+APPLICATION 2: HERMES - ACCEPTANCE OF PERSISTENT REVISIONS
+
+Requirement
+On the native skill_manage revision path, a candidate correction must remain separate from the current reusable skill until approval and successful structural validation and application. Pending, rejected, and invalid candidates must leave the current version intact. A valid accepted revision must be readable for subsequent use.
+
+Fixtures
+One stored report-processing skill and a recorded task correction. The valid revision adds the instruction to ignore empty input lines before parsing integers; the malformed full-content revision omits the required frontmatter. An isolated Hermes home runs the native skill_manage tool and the shared approval-command handler with skills.write_approval=true; the scripted candidate stands in for the output of revision proposal.
+
+RA decisions
+- Repair & Evolution; interaction ordering: run-local repair and persistent revision have different objects and return paths. The persistent branch is selected, and the candidate stays separate until acceptance.
+- Distribution; Repair & Evolution: Distribution coordinates validation and acceptance before supply. Approval is an input to acceptance, not proof that the candidate passed validation or became current; storage is confirmed only after the application result succeeds.
+- Distribution; Identifier Substrate: artefact identity and evidence links identify the version actually used, through the candidate ID, before/after skill hashes, acceptance response, and read-back content.
+
+Allocation
+- Supplied correction and candidate -> controlled inputs to the persistent path of Repair & Evolution.
+- Pending store and approval-command workflow -> candidate handling within Distribution.
+- Skill-manager structural checks and successful apply -> Distribution's validation and acceptance.
+- Current skill directory -> Representation & Storage.
+- Native skill reader -> subsequent availability to Mediation.
+- Pending IDs and native responses, plus driver snapshots -> application evidence.
+
+Checks and expected observations
+B1  Submit a valid edit with write approval enabled: a staged candidate is obtained and its preview displays the proposed correction; the current file, hash, and skill-reader content remain the original version.
+B2  Reject that candidate: the pending record is removed; the current version is unchanged.
+B3  Stage a fresh valid edit and approve it: application succeeds, the pending record is removed, and the current file and native skill reader expose the expected revised content.
+B4  Stage a malformed full-content edit and approve it: validation rejects application and the current version is unchanged; the failed candidate stays pending, as source inspection predicts.
+
+Assessment
+The checks test whether the RA's candidate-to-acceptance-to-supply dependency distinguishes B1-B4 and guides the placement and order of checks, with approval and successful persistence recorded as separate observations.
+
+
+EXPLORATORY HERMES CHECKS
+
+After B1-B4, two exploratory checks examined the revision-acceptance interface. PREVIEW compares the previews of the valid (B1) and malformed (B4) full-rewrite candidates. LEDGER inspects the native records of an accepted revision for links to its candidate and approval. LEGACY, a control, previews the same malformed content staged through the legacy edit action.

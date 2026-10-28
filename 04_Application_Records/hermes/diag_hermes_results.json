@@ -1,0 +1,52 @@
+{
+  "purpose": "Exploratory Hermes checks of preview fidelity and revision-record links.\n\nOperates on a COPY of the Hermes home created by run_hermes.py, leaving that home unchanged.\n  PREVIEW - What does /skills diff show for the retained malformed candidate (B4)? Can it be\n            distinguished from the valid candidate previewed in B1?\n  LEGACY  - For the same malformed content staged through the legacy flat `edit` action, what does\n            the preview show? (Isolates the preview branch from the candidate content.)\n  LEDGER  - Which native records identify the accepted revision, and do they reference the\n            pending candidate ID that was approved?\n",
+  "source_home_copied": "<project>/tmp/ra_application_checks_2026-10-14/hermes-run-20261014T030353431124/hermes-home",
+  "diag_home": "<project>/tmp/ra_application_checks_2026-10-14/diag-hermes-20261014T030606387696/hermes-home",
+  "PREVIEW": {
+    "b4_candidate_id": "a42858ff",
+    "b4_payload_ops": [
+      {
+        "action": "patch",
+        "name": "report-skill",
+        "content": "# Report skill\nA candidate without required frontmatter.\n"
+      }
+    ],
+    "b4_preview": "# Pending skill write a42858ff: batch(1 ops: patch) on report-skill\n\n## op 1/1: patch 'report-skill' SKILL.md (+0/-0 lines)\n\n(patch would fail: old_string is empty \u2014 nothing to match. Set old_string to the exact existing text the replacement should replace (read the file first if unsure). To create a new file or fully rewrite one, use write_file instead. Do not re-send this call unchanged.)",
+    "b1_preview_recorded_in_replay": "# Pending skill write f5d7c588: batch(1 ops: patch) on report-skill\n\n## op 1/1: patch 'report-skill' SKILL.md (+0/-0 lines)\n\n(patch would fail: old_string is empty \u2014 nothing to match. Set old_string to the exact existing text the replacement should replace (read the file first if unsure). To create a new file or fully rewrite one, use write_file instead. Do not re-send this call unchanged.)",
+    "valid_and_malformed_previews_identical_after_header": true
+  },
+  "LEGACY": {
+    "staging_result": {
+      "success": true,
+      "staged": true,
+      "pending_id": "aac0963c",
+      "gist": "rewrite 'report-skill' (57 chars)",
+      "message": "Staged for approval (skills.write_approval is on). Not yet saved \u2014 review with /skills pending."
+    },
+    "preview": "# Pending skill write aac0963c: rewrite 'report-skill' (57 chars)\n\n--- a/SKILL.md\n+++ b/SKILL.md\n@@ -1,7 +1,2 @@\n----\n-name: report-skill\n-description: Prepare a numeric report from a local input file.\n----\n # Report skill\n-Read comma-separated integers and produce their total.\n-Ignore empty input lines before parsing the integers.\n+A candidate without required frontmatter.\n"
+  },
+  "LEDGER": {
+    "files_in_home": [
+      ".curator_backups/blobs/56b88057c7aa885f734102a9cd1750f89581f2efe544e9679aecb1ccc9e2731c",
+      ".curator_backups/blobs/fb84bc2abb31014cd042822c0a98bd7afe3b8081329414500da0143a18f4c3a7",
+      "SOUL.md",
+      "backups/config/config.yaml.good.20261014-133353",
+      "config.yaml",
+      "pending/skills/a42858ff.json",
+      "pending/skills/aac0963c.json",
+      "skills/.curator_ledger.jsonl",
+      "skills/.locks/90d159103faa254362d287e63520e2a0cc0acf6f043e5778b10cb802fcfce15a.lock",
+      "skills/.locks/ledger.lock",
+      "skills/.usage.json",
+      "skills/.usage.json.lock",
+      "skills/report-skill/SKILL.md"
+    ],
+    "skills/.curator_ledger.jsonl": "{\"id\": \"49e0ac957c54\", \"ts\": \"2026-10-14T03:03:53.567659+00:00\", \"actor\": \"agent\", \"action\": \"patch\", \"skill\": \"report-skill\", \"evidence\": {}, \"before\": [{\"path\": \"<project>/tmp/ra_application_checks_2026-10-14/hermes-run-20261014T030353431124/hermes-home/skills/report-skill/SKILL.md\", \"sha256\": \"fb84bc2abb31014cd042822c0a98bd7afe3b8081329414500da0143a18f4c3a7\"}], \"after\": [{\"path\": \"<project>/tmp/ra_application_checks_2026-10-14/hermes-run-20261014T030353431124/hermes-home/skills/report-skill/SKILL.md\", \"sha256\": \"56b88057c7aa885f734102a9cd1750f89581f2efe544e9679aecb1ccc9e2731c\"}]}\n",
+    "skills/.locks/ledger.lock": "",
+    "skills/.usage.json": "{\n  \"report-skill\": {\n    \"archived_at\": null,\n    \"created_at\": \"2026-10-14T03:03:53.573988+00:00\",\n    \"created_by\": null,\n    \"first_seen_at\": null,\n    \"last_patched_at\": \"2026-10-14T03:03:53.573996+00:00\",\n    \"last_reused_patch_generation\": 0,\n    \"last_used_at\": null,\n    \"last_viewed_at\": null,\n    \"patch_count\": 1,\n    \"patch_generation\": 1,\n    \"pinned\": false,\n    \"state\": \"active\",\n    \"use_count\": 0,\n    \"view_count\": 0\n  }\n}",
+    "skills/.usage.json.lock": "",
+    "approved_candidate_id": "3e5847cc",
+    "approved_candidate_id_appears_in_native_records": false,
+    "accepted_revision_sha256_appears_in_native_records": true
+  }
+}
